@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StatusBar,
   SafeAreaView,
@@ -9,16 +9,51 @@ import {
 } from 'react-native';
 import colors from './src/utils/colors';
 import Form from './src/components/Form';
+import Footer from './src/components/Footer';
+import Resultado from './src/components/Resultado';
 
 const App = () => {
   const [capital, setCapital] = useState(null);
   const [intereses, setIntereses] = useState(null);
   const [meses, setMeses] = useState(null);
+  const [total, setTotal] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [botonCalcular, setBotonCalcular] = useState(false);
 
-  const onSubmit = () => {
-    console.log('capital ->', capital)
-    console.log('intereses ->', intereses)
-    console.log('meses ->', meses)
+  useEffect(() => {
+    if(capital, intereses, meses, botonCalcular){
+      calcularPrestamo();
+    }else{
+      resetear();
+    }
+  },[capital, intereses, meses])
+
+  const calcularPrestamo = () => {
+
+    resetear();
+
+    if(!capital){
+      setErrorMessage('Añade la cantidad que quieres solicitar.');
+    }else if(!intereses){
+      setErrorMessage('Añade el interes del prestamo a solicitar.');
+    }else if(!meses){
+      setErrorMessage('Añade los meses del prestamo a solicitar.');
+    }else{
+      const i = intereses / 100;
+      const valorCuota = capital / ((1 - Math.pow(i + 1, -meses)) / i);
+      setTotal({
+        cuotaMensual: valorCuota.toFixed(2).replace('.',','),
+        totalPagado: (valorCuota * meses).toFixed(2).replace('.',','),
+      })
+    }
+
+    setBotonCalcular(true);
+
+  }
+
+  const resetear = () => {
+    setErrorMessage('');
+    setTotal(null);
   }
 
   return (
@@ -32,16 +67,15 @@ const App = () => {
           setIntereses={setIntereses}
           setMeses={setMeses}
         />
-      </SafeAreaView>
-      
-      <View>
-        <Text>Resultado</Text>
-      </View>
-
-      <View>
-        <Text>Footer</Text>
-        <Button title="Consultar" onPress={onSubmit} />
-      </View>
+      </SafeAreaView>    
+      <Resultado 
+        errorMessage={errorMessage} 
+        capital={capital}
+        intereses={intereses}
+        meses={meses}
+        total={total}
+      />
+      <Footer calcularPrestamo={calcularPrestamo} />
     </>
   );
 };

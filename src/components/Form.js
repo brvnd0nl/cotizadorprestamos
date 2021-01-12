@@ -27,6 +27,10 @@ const Form = (props) => {
                 style={pickerSelectStyle}
                 onValueChange={(value) => setMeses(value)}
                 fixAndroidTouchableBug
+                placeholder={{
+                    label: 'Selecciona los plazos...',
+                    value: null,
+                }}
                 items={[
                     { label: '3 meses', value: '3' },
                     { label: '6 meses', value: '6' },
